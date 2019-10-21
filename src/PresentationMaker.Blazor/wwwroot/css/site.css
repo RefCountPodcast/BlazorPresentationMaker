@@ -133,3 +133,9 @@ app {
         display: block;
     }
 }
+
+
+textarea {
+    width:100%;
+    height:100%;
+}

@@ -1,7 +1,32 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<div class="row">
+    <div class="col-sm-6">
+    <textarea placeholder="Enter markup..." @bind="input">
 
-Welcome to your new app.
+    </textarea>
+    <div>
+        <button class="btn btn-primary" @onclick="Generate">Generate HTML</button>
+    </div>
 
-<SurveyPrompt Title="How is Blazor working for you?" />
+    </div>
+    <div class="col-sm-6">
+        <textarea placeholder="Output">
+            @output
+        </textarea>
+    </div>
+</div>
+
+
+
+
+
+
+@code {
+    string input = "";
+    string output = "";
+
+    void Generate() {
+        output = CommonMark.CommonMarkConverter.Convert(input);
+    }
+}
