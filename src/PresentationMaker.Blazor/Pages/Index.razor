@@ -1,8 +1,10 @@
 ﻿@page "/"
+@using PresentationMaker.Blazor.Interpreter
 
+<div class="container">
 <div class="row">
     <div class="col-sm-6">
-    <textarea placeholder="Enter markup..." @bind="input">
+    <textarea placeholder="Enter markdown..." @bind="markdownInput">
 
     </textarea>
     <div>
@@ -11,15 +13,41 @@
 
     </div>
     <div class="col-sm-6">
-        <Slide Markup="@output"></Slide>
+        <Slide Markup="@markdownOutput"></Slide>
     </div>
 </div>
 
+<div class="row">
+    <div class="col-sm-6">
+    <textarea placeholder="Enter C# code..." @bind="csharpInput">
+    </textarea>
+    <div>
+        <button class="btn btn-primary" @onclick="Run">Run C#</button>
+    </div>
+
+    </div>
+    <div class="col-sm-6">
+        <Slide Markup="@csharpOutput"></Slide>
+    </div>
+</div>
+
+</div>
+
+
 @code {
-    string input = "";
-    string output = "";
+    [Inject] HttpClient Client {get; set;}
+
+    string markdownInput = "";
+    string markdownOutput = "";
+
+    string csharpInput = "Console.WriteLine(\"foo\");";
+    string csharpOutput = "";
 
     void Generate() {
-        output = CommonMark.CommonMarkConverter.Convert(input);
+        markdownOutput = CommonMark.CommonMarkConverter.Convert(markdownInput);
+    }
+
+    async void Run() {
+        csharpOutput = await new Interpreter(Client).Run(csharpInput);
     }
 }
