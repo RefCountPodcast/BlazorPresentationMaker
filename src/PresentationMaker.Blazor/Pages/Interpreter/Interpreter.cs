@@ -12,7 +12,7 @@ namespace PresentationMaker.Blazor.Interpreter
 {
     public class Interpreter
     {
-        private MetadataReference[] _assemblies;
+        private Assembly[] _assemblies;
         private HttpClient _client;
         public Interpreter(HttpClient client)
         {
@@ -42,7 +42,9 @@ namespace PresentationMaker.Blazor.Interpreter
                         assemblyResponses.Select(resp => resp.Content.ReadAsStreamAsync()));
 
                     _assemblies = assemblies
-                        .Select(a => MetadataReference.CreateFromStream(a))
+                        .Select(a => 
+                         Assembly.Load(((MemoryStream) a).ToArray())
+                        )
                         .ToArray();
                 }
 
@@ -51,10 +53,12 @@ namespace PresentationMaker.Blazor.Interpreter
                 var stdOut = new StringWriter();
                 Console.SetOut(stdOut);
 
+                var coreAssembly = typeof(object).Assembly;
                 var options = ScriptOptions.Default.WithReferences(_assemblies);
 
                 oldOut.WriteLine("Created Options");
 
+                await CSharpScript.EvaluateAsync(script, options);
 /*
                 var t = CSharpScript
                         .Create(@"using System;
@@ -63,14 +67,13 @@ namespace PresentationMaker.Blazor.Interpreter
                                 options)
                         .ContinueWith(script)
                         .RunAsync();
-*/
-
-                var t = CSharpScript.EvaluateAsync(script, options);
 
                 for (int i=0; i<10; i++) {
                     oldOut.WriteLine($"t.Status = {t.Status}");
                     await Task.Delay(100);
                 }
+                await t;
+                        */
 
                 oldOut.WriteLine("Ran Script");
 
